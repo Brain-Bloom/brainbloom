@@ -7,7 +7,7 @@ AWS.config.update({ region: 'eu-west-1' });
 const docClient = new AWS.DynamoDB.DocumentClient();
 
 // Read the JSON data from the file
-const jsonData = JSON.parse(fs.readFileSync('courses.json'));
+const jsonData = JSON.parse(fs.readFileSync('courses/courses.json'));
 
 // Define the DynamoDB table name
 const tableName = 'dev-courses';
