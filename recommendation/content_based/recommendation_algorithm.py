@@ -16,7 +16,7 @@ vectorizer = TfidfVectorizer(stop_words='english')
 tfidf_matrix = vectorizer.fit_transform(descriptions)
 
 
-def recommend_courses(course_url, num_recommendations=5):
+def recommend_courses_from_url(course_url, num_recommendations=5):
     # Find the index of the course in the dataset
     index = urls.index(course_url)
 
@@ -40,3 +40,31 @@ def recommend_courses(course_url, num_recommendations=5):
         print(f"{i + 1}. {courses[course_index]['course_name']} - {courses[course_index]['course_url']}")
 
 
+def recommend_courses_from_skills(preferred_skills, difficulty_level, num_recommendations=12):
+    # Combine preferred skills into a single string (you can modify this based on your actual data)
+    preferred_skills_str = ' '.join(preferred_skills)
+
+    # Vectorize the preferred skills
+    preferred_skills_vector = vectorizer.transform([preferred_skills_str])
+
+    # Calculate cosine similarity between the preferred skills and all courses
+    cosine_similarities = linear_kernel(preferred_skills_vector, tfidf_matrix).flatten()
+
+    # Adjust similarity scores based on difficulty level
+    for i, difficulty in enumerate(difficulty_levels):
+        if difficulty == difficulty_level:
+            cosine_similarities[i] += 0.1  # Increase similarity for courses with the same difficulty
+
+    # Get the indices of courses with the highest similarity
+    similar_courses_indices = cosine_similarities.argsort()[:-num_recommendations - 1:-1]
+
+    # Return the recommended courses and their URLs
+    recommended_courses = [
+        {
+            "course_name": courses[course_index]['course_name'],
+            "course_url": courses[course_index]['course_url']
+        }
+        for course_index in similar_courses_indices
+    ]
+
+    return recommended_courses

@@ -12,5 +12,5 @@ else:
     queried_course = Course.get(queried_course_key).course_url
 
     # Perform recommendation using the queried course
-    ra.recommend_courses(queried_course)
+    ra.recommend_courses_from_url(queried_course)
 
