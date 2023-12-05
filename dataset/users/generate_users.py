@@ -9,20 +9,58 @@ with open("../courses/courses.json", "r") as courses_file:
 
 # Expanded list of professions and preferred topics
 professions = [
-    "Software Engineer", "Data Scientist", "Data Analyst", "Student",
-    "Teacher", "Graphic Designer", "Marketing Specialist", "Nurse",
-    "Architect", "Chef", "Journalist", "Financial Analyst",
-    "Biologist", "Civil Engineer", "Psychologist", "Electrician",
-    "Lawyer", "Librarian", "Pharmacist", "Social Worker",
-    "Physicist", "Police Officer", "Pilot", "Mechanical Engineer",
-    "Dentist", "Artist", "Veterinarian", "IT Consultant",
-    "Speech Therapist", "Translator", "Fitness Trainer", "Economist",
-    "Geologist", "Software Developer", "HR Specialist", "Mathematician",
-    "Electrician", "Astronomer", "Robotics Engineer", "Interior Designer",
-    "Event Planner", "Biomedical Engineer", "Air Traffic Controller",
-    "Insurance Agent", "Zoologist", "Meteorologist", "Archaeologist",
-    "Forensic Scientist", "Paramedic", "Cartographer", "Flight Attendant"
+    ("Software Engineer", "Master's Degree"),
+    ("Data Scientist", "Master's Degree"),
+    ("Data Analyst", "Bachelor's Degree"),
+    ("Student", "High School"),
+    ("Teacher", "Bachelor's Degree"),
+    ("Graphic Designer", "Bachelor's Degree"),
+    ("Marketing Specialist", "Bachelor's Degree"),
+    ("Nurse", "Bachelor's Degree"),
+    ("Architect", "Master's Degree"),
+    ("Chef", "High School"),
+    ("Journalist", "Bachelor's Degree"),
+    ("Financial Analyst", "Bachelor's Degree"),
+    ("Biologist", "Ph.D."),
+    ("Civil Engineer", "Bachelor's Degree"),
+    ("Psychologist", "Ph.D."),
+    ("Electrician", "High School"),
+    ("Lawyer", "Ph.D."),
+    ("Librarian", "Master's Degree"),
+    ("Pharmacist", "Ph.D."),
+    ("Social Worker", "Master's Degree"),
+    ("Physicist", "Ph.D."),
+    ("Police Officer", "High School"),
+    ("Pilot", "Bachelor's Degree"),
+    ("Mechanical Engineer", "Bachelor's Degree"),
+    ("Dentist", "Ph.D."),
+    ("Artist", "Bachelor's Degree"),
+    ("Veterinarian", "Ph.D."),
+    ("IT Consultant", "Bachelor's Degree"),
+    ("Speech Therapist", "Master's Degree"),
+    ("Translator", "Bachelor's Degree"),
+    ("Fitness Trainer", "Bachelor's Degree"),
+    ("Economist", "Ph.D."),
+    ("Geologist", "Master's Degree"),
+    ("Software Developer", "Bachelor's Degree"),
+    ("HR Specialist", "Bachelor's Degree"),
+    ("Mathematician", "Ph.D."),
+    ("Astronomer", "Ph.D."),
+    ("Robotics Engineer", "Master's Degree"),
+    ("Interior Designer", "Bachelor's Degree"),
+    ("Event Planner", "Bachelor's Degree"),
+    ("Biomedical Engineer", "Master's Degree"),
+    ("Air Traffic Controller", "Bachelor's Degree"),
+    ("Insurance Agent", "Bachelor's Degree"),
+    ("Zoologist", "Ph.D."),
+    ("Meteorologist", "Master's Degree"),
+    ("Archaeologist", "Ph.D."),
+    ("Forensic Scientist", "Ph.D."),
+    ("Paramedic", "Bachelor's Degree"),
+    ("Cartographer", "Bachelor's Degree"),
+    ("Flight Attendant", "High School")
 ]
+
 
 preferred_topics = [
     "Data Science", "Web Development", "Business Analytics",
@@ -37,20 +75,39 @@ preferred_topics = [
     "Political Science", "Gardening", "Yoga", "Neuroscience",
     "Mobile App Development", "Cybersecurity", "3D Printing", "Virtual Reality",
     "Interior Design", "Culinary Arts", "Animation", "DIY Crafts",
-    "Space Exploration", "Renewable Energy", "Urban Planning", "Marine Biology"
+    "Space Exploration", "Renewable Energy", "Urban Planning", "Marine Biology",
+    "Art History", "Medicine", "Astronomy", "Geology", "Anthropology",
+    "Archaeology", "Computer Science", "Literature", "Sustainable Living",
+    "Social Media Management", "Ethical Hacking", "Public Speaking", "Business Strategy",
+    "Fashion Styling", "Game Design", "Quantum Mechanics", "Educational Technology",
+    "Human Rights", "Climate Change", "Wildlife Conservation", "Futurism",
+    "Data Visualization", "Biotechnology", "Sports Science", "Theater Arts",
+    "Mobile Photography", "User Experience Design", "Data Ethics", "Augmented Reality",
+    "Renewable Technology", "Bioinformatics", "Educational Psychology", "Behavioral Economics",
+    "Virtual Assistant Development", "Science Fiction Literature", "Blockchain Applications",
+    "Personal Finance Management", "Mental Health Awareness", "Cryptocurrency Trading", "Health Informatics",
+    "Environmental Sustainability", "Fintech Innovations", "Green Architecture", "Marine Conservation",
+    "Social Entrepreneurship", "Inclusive Design", "Mindfulness Practices", "Remote Sensing Technology",
+    "Aerospace Engineering", "Quantum Computing", "Natural Language Processing", "Disaster Management",
+    "Quantum Biology", "Social Justice Issues", "Renewable Energy Policy", "Molecular Gastronomy",
+    "Ethical Fashion", "Community Gardening", "Home Automation", "DIY Home Decor",
+    "Artificial General Intelligence", "Exoplanet Exploration", "Behavioral Ecology", "Renewable Energy Entrepreneurship",
+    "Neuroaesthetics", "Educational Gamification", "Biohacking", "Sustainable Fashion Design",
+    "Space Tourism", "Cognitive Neuroscience", "Edible Insect Farming", "Personalized Medicine"
 ]
 
 
 # Generate a list of 300 users
 users = []
 for user_id in range(1, 301):
+    profession = random.choice(professions)
     user = {
         "user_id": user_id,
         "demographics": {
             "age": random.randint(16, 70),
             "gender": random.choice(["Male", "Female"]),
-            "education_level": random.choice(["High School", "Bachelor's Degree", "Master's Degree", "Ph.D."]),
-            "profession": random.choice(professions)
+            "education_level": profession[1],
+            "profession": profession[0]
         },
         "preferences": {
             "preferred_difficulty": random.choice(["Beginner", "Intermediate", "Advanced", "Not Calibrated"]),
