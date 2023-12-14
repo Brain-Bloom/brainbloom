@@ -61,7 +61,6 @@ professions = [
     ("Flight Attendant", "High School")
 ]
 
-
 preferred_topics = [
     "Data Science", "Web Development", "Business Analytics",
     "Python Programming", "Artificial Intelligence", "Photography",
@@ -91,48 +90,53 @@ preferred_topics = [
     "Aerospace Engineering", "Quantum Computing", "Natural Language Processing", "Disaster Management",
     "Quantum Biology", "Social Justice Issues", "Renewable Energy Policy", "Molecular Gastronomy",
     "Ethical Fashion", "Community Gardening", "Home Automation", "DIY Home Decor",
-    "Artificial General Intelligence", "Exoplanet Exploration", "Behavioral Ecology", "Renewable Energy Entrepreneurship",
+    "Artificial General Intelligence", "Exoplanet Exploration", "Behavioral Ecology",
+    "Renewable Energy Entrepreneurship",
     "Neuroaesthetics", "Educational Gamification", "Biohacking", "Sustainable Fashion Design",
     "Space Tourism", "Cognitive Neuroscience", "Edible Insect Farming", "Personalized Medicine"
 ]
 
 
 # Generate a list of 300 users
-users = []
-for user_id in range(1, 301):
-    profession = random.choice(professions)
-    user = {
-        "user_id": user_id,
-        "demographics": {
-            "age": random.randint(16, 70),
-            "gender": random.choice(["Male", "Female"]),
-            "education_level": profession[1],
-            "profession": profession[0]
-        },
-        "preferences": {
-            "preferred_difficulty": random.choice(["Beginner", "Intermediate", "Advanced", "Not Calibrated"]),
-            "preferred_skills": random.sample(preferred_topics, 3),
-        },
-    }
-
-    # Get content-based recommendations based on preferred skills
-    recommended_courses = recommend_courses_from_skills(user["preferences"]["preferred_skills"], user["preferences"]["preferred_difficulty"])
-
-    # Add interactions with recommended courses
-    user["interactions"] = [
-        {
-            "course_url": recommended_course,
-            "rating": random.randint(1, 5),
-            "completed": random.choice([True, False])
+def generate_users(n):
+    users = []
+    for user_id in range(0, n):
+        profession = random.choice(professions)
+        user = {
+            "user_id": user_id,
+            "demographics": {
+                "age": random.randint(16, 70),
+                "gender": random.choice(["Male", "Female"]),
+                "education_level": profession[1],
+                "profession": profession[0]
+            },
+            "preferences": {
+                "preferred_difficulty": random.choice(["Beginner", "Intermediate", "Advanced", "Not Calibrated"]),
+                "preferred_skills": random.sample(preferred_topics, 3),
+            },
         }
-        for recommended_course in recommended_courses
-    ]
 
-    users.append(user)
+        # Get content-based recommendations based on preferred skills
+        recommended_courses = recommend_courses_from_skills(user["preferences"]["preferred_skills"],
+                                                            user["preferences"]["preferred_difficulty"],
+                                                            random.randint(0, 12))
+
+        # Add interactions with recommended courses
+        user["interactions"] = [
+            {
+                "course_url": recommended_course,
+                "rating": random.randint(1, 5),
+                "completed": random.choice([True, False])
+            }
+            for recommended_course in recommended_courses
+        ]
+
+        users.append(user)
+    return users
+
 
 # Save the generated dataset to a JSON file
-output_data = {"users": users}
 with open("users.json", "w") as output_file:
-    json.dump(output_data, output_file, indent=2)
+    json.dump(generate_users(1000), output_file, indent=2)
 
 print("Generated dataset saved to 'users.json'")
