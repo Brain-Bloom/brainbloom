@@ -1,7 +1,23 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
 provider "aws" {
   region = "eu-west-1" # Set your desired AWS region
-  access_key = var.access_key
-  secret_key = var.secret_key
+}
+
+
+resource "aws_s3_bucket" "bucket" {
+  bucket = "s3_bucket_cours_master_projet"
+
+  tags = {
+    Name        = "My bucket"
+  }
 }
 
 resource "aws_dynamodb_table" "courses" {
@@ -15,3 +31,5 @@ resource "aws_dynamodb_table" "courses" {
   }
 
 }
+
+
