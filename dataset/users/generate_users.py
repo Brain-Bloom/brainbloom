@@ -1,5 +1,6 @@
 import json
 import random
+from random import gauss
 from recommendation.content_based.recommendation_algorithm import recommend_courses_from_skills
 
 # Read course names from "courses.json"
@@ -125,7 +126,7 @@ def generate_users(n):
         user["interactions"] = [
             {
                 "course_url": recommended_course,
-                "rating": random.randint(1, 5),
+                "rating": max(min(round(gauss(3.5, 1.0)), 5), 1),
                 "completed": random.choice([True, False])
             }
             for recommended_course in recommended_courses
@@ -140,6 +141,30 @@ def save_to_json(filename):
     with open(filename, "w") as output_file:
         json.dump(generate_users(1000), output_file, indent=2)
 
+<<<<<<< HEAD
     print("Generated dataset saved to ", filename)
 
 # save_to_json("users.json")
+=======
+print("Generated dataset saved to 'users.json'")
+
+
+def count_high_ratings(file_path):
+    with open(file_path, 'r') as file:
+        users_data = json.load(file)
+
+    # Count the number of high ratings
+    high_ratings_count = 0
+    for user in users_data:
+        for interaction in user['interactions']:
+            if interaction['rating'] < 1:
+                high_ratings_count += 1
+                print(user['user_id'])
+
+    return high_ratings_count
+
+# Example usage
+file_path = 'users.json'
+high_ratings_count = count_high_ratings(file_path)
+print(f"Number of ratings : {high_ratings_count}")
+>>>>>>> a2a9ab2 (count high ratings)

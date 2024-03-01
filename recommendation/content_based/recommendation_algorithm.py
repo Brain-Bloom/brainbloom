@@ -34,7 +34,10 @@ def recommend_courses_from_url(course_url, num_recommendations=5):
             cosine_similarities[i] += 0.1  # Increase similarity for courses with the same difficulty
 
     # Get the indices of courses with highest similarity
-    similar_courses_indices = cosine_similarities.argsort()[:-num_recommendations - 1:-1]
+    similar_courses_indices = cosine_similarities.argsort()[:-(num_recommendations + 1) - 1:-1]
+
+    # Filter out the target course from the recommended courses
+    similar_courses_indices = [idx for idx in similar_courses_indices if idx != index]
 
     # Print the recommended courses and their URLs
     print(f"Recommended courses for {courses[index]['course_name']} ({course_url}):")
