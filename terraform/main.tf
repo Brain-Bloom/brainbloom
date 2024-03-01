@@ -12,12 +12,8 @@ provider "aws" {
 }
 
 
-resource "aws_s3_bucket" "bucket" {
-  bucket = "s3_bucket_cours_master_projet"
-
-  tags = {
-    Name        = "My bucket"
-  }
+resource "aws_s3_bucket" "courses_bucket" {
+  bucket = "s3_bucket_courses_master_projet"
 }
 
 resource "aws_dynamodb_table" "courses" {
@@ -29,7 +25,21 @@ resource "aws_dynamodb_table" "courses" {
     name = "course_url"
     type = "S"
   }
+}
 
+resource "aws_s3_bucket" "user_bucket" {
+  bucket = "s3_bucket_cours_master_projet"
+}
+
+resource "aws_dynamodb_table" "users" {
+  name           = "dev-users"
+  billing_mode   = "PAY_PER_REQUEST"
+  hash_key = "user_email"
+
+  attribute {
+    name = "user_email"
+    type = "S"
+  }
 }
 
 
