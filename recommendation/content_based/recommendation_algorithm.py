@@ -43,7 +43,7 @@ def recommend_courses_from_url(course_url, num_recommendations=5):
 
 
 def recommend_courses_from_skills(preferred_skills, difficulty_level, num_recommendations=12):
-    # Combine preferred skills into a single string (you can modify this based on your actual data)
+    # Combine preferred skills into a single string
     preferred_skills_str = ' '.join(preferred_skills)
 
     # Vectorize the preferred skills
