@@ -92,7 +92,7 @@ driver.quit()
 # Write scraped courses to a JSON file
 def save_to_json(filename):
     with open(filename, 'w') as json_file:
-        json.dump(scraped_courses, json_file, indent=1)
+        json.dump(scraped_courses, json_file, indent=2)
 
     print("Generated dataset saved to ", filename)
 
