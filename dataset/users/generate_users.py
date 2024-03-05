@@ -136,7 +136,10 @@ def generate_users(n):
 
 
 # Save the generated dataset to a JSON file
-with open("users.json", "w") as output_file:
-    json.dump(generate_users(1000), output_file, indent=2)
+def save_to_json(filename):
+    with open(filename, "w") as output_file:
+        json.dump(generate_users(1000), output_file, indent=2)
 
-print("Generated dataset saved to 'users.json'")
+    print("Generated dataset saved to ", filename)
+
+# save_to_json("users.json")
