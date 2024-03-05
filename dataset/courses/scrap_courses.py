@@ -78,7 +78,7 @@ for keyword in preferred_topics:
         "course_rating": course_rating_element,
         "course_url": course_url_element,
         "course_description": course_description_element,
-        "skills": ""
+        "skills": course_skills_element
     }
 
     # Add the scraped course to the list
