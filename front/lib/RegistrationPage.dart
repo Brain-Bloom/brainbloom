@@ -1,11 +1,18 @@
 import 'package:brainbloom/MyDropdownButton.dart';
 import 'package:flutter/material.dart';
 import 'package:brainbloom/textField.dart';
+import 'package:aws_dynamodb_api/dynamodb-2011-12-05.dart';
 
 
 class RegistrationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+
+
+
+
+
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Inscription'),
@@ -35,7 +42,7 @@ class RegistrationPage extends StatelessWidget {
                   width: MediaQuery.of(context).size.width * 0.6,
                   child: MyTextField(
                     textEditingController: TextEditingController(),
-                    hintText: 'Adresse email',
+                    hintText: 'Username',
                     hasError: false,
                   ),
                 ),
