@@ -97,4 +97,22 @@ def save_to_json(filename):
     print("Generated dataset saved to ", filename)
 
 
+def replace_difficulty_level(json_file):
+    # Load the JSON file
+    with open(json_file, "r") as file:
+        data = json.load(file)
+
+    # Replace "General" with "Intermediate" for the key "difficulty_level"
+    for entry in data:
+        if entry.get("difficulty_level") == "General":
+            entry["difficulty_level"] = "Intermediate"
+
+    # Write the updated data back to the JSON file
+    with open(json_file, "w") as file:
+        json.dump(data, file, indent=2)
+
+    print("Data as been normalized.")
+
+
 save_to_json('scraped_courses.json')
+replace_difficulty_level("scraped_courses.json")
