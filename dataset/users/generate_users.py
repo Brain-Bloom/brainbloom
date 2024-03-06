@@ -98,7 +98,7 @@ preferred_topics = [
 ]
 
 
-# Generate a list of 300 users
+# Generate a list of n users
 def generate_users(n):
     users = []
     for user_id in range(0, n):
@@ -141,15 +141,10 @@ def save_to_json(filename):
     with open(filename, "w") as output_file:
         json.dump(generate_users(1000), output_file, indent=2)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     print("Generated dataset saved to ", filename)
 
+# generate_users(1000)
 # save_to_json("users.json")
-=======
-=======
->>>>>>> ea7f772 (scraping linkedin learning)
-print("Generated dataset saved to 'users.json'")
 
 
 def count_high_ratings(file_path):
@@ -166,16 +161,3 @@ def count_high_ratings(file_path):
 
     return high_ratings_count
 
-# Example usage
-file_path = 'users.json'
-high_ratings_count = count_high_ratings(file_path)
-print(f"Number of ratings : {high_ratings_count}")
-<<<<<<< HEAD
->>>>>>> a2a9ab2 (count high ratings)
-=======
-=======
-    print("Generated dataset saved to ", filename)
-
-# save_to_json("users.json")
->>>>>>> fba7fef (scraping linkedin learning)
->>>>>>> ea7f772 (scraping linkedin learning)
