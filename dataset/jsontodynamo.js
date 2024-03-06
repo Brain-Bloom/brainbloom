@@ -6,29 +6,49 @@ AWS.config.update({ region: 'eu-west-1' });
 
 const docClient = new AWS.DynamoDB.DocumentClient();
 
-// Read the JSON data from the file
-const jsonData = JSON.parse(fs.readFileSync('courses/courses.json'));
+function insertDataIntoDynamoDB(jsonData, tableName, callback) {
+  // Function to insert an item into DynamoDB
+  function putItem(item) {
+    const params = {
+      TableName: tableName,
+      Item: item,
+    };
 
-// Define the DynamoDB table name
-const tableName = 'dev-courses';
+    docClient.put(params, (err, data) => {
+      if (err) {
+        console.error('Error inserting data:', err);
+      } else {
+        console.log('Data inserted successfully:', item);
+      }
+    });
+  }
 
-// Function to insert an item into DynamoDB
-function putItem(item) {
-  const params = {
-    TableName: tableName,
-    Item: item,
-  };
+  // Convert to array if jsonData is an object
+  const dataArray = Array.isArray(jsonData) ? jsonData : [jsonData];
 
-  docClient.put(params, (err, data) => {
-    if (err) {
-      console.error('Error inserting data:', err);
-    } else {
-      console.log('Data inserted successfully:', item);
-    }
+  // Iterate over each item in the JSON data and insert it into DynamoDB
+  dataArray.forEach((item) => {
+    putItem(item);
   });
+
+  // Call the callback function if provided
+  if (typeof callback === 'function') {
+    callback();
+  }
 }
 
-// Iterate over each item in the JSON data and insert it into DynamoDB
-jsonData.forEach((item) => {
-  putItem(item);
+// Example usage for courses.json
+const coursesData = JSON.parse(fs.readFileSync('courses/courses.json'));
+const coursesTableName = 'dev-courses';
+
+insertDataIntoDynamoDB(coursesData, coursesTableName, () => {
+  console.log('Insertion for courses.json completed.');
+});
+
+// Example usage for users.json
+const usersData = JSON.parse(fs.readFileSync('users/users.json'));
+const usersTableName = 'dev-users';
+
+insertDataIntoDynamoDB(usersData, usersTableName, () => {
+  console.log('Insertion for users.json completed.');
 });
