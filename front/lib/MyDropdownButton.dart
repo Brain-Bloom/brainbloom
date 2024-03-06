@@ -5,12 +5,14 @@ class MyDropdownButton extends StatefulWidget {
   final List<String> items;
   String? selectedItem;
   final bool hasError;
+  final ValueChanged<String>? onChanged;
 
   MyDropdownButton({
     this.hint,
     required this.items,
     this.selectedItem,
     required this.hasError,
+    this.onChanged,
     Key? key,
   }) : super(key: key);
 
@@ -34,7 +36,6 @@ class MyDropdownButtonState extends State<MyDropdownButton> {
           horizontal: MediaQuery.of(context).size.width * 0.01,
         ),
         child: DropdownButton<String>(
-
           value: widget.selectedItem,
           hint: Text(
             widget.hint ?? "Select",
@@ -42,7 +43,6 @@ class MyDropdownButtonState extends State<MyDropdownButton> {
               fontStyle: FontStyle.italic,
               fontFamily: 'Roboto',
             ),
-
           ),
           items: widget.items.map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
@@ -60,6 +60,9 @@ class MyDropdownButtonState extends State<MyDropdownButton> {
             setState(() {
               widget.selectedItem = newValue;
             });
+            if (widget.onChanged != null) {
+              widget.onChanged!(newValue!);
+            }
           },
           underline: Container(),
           isExpanded: true,
@@ -72,4 +75,3 @@ class MyDropdownButtonState extends State<MyDropdownButton> {
     );
   }
 }
-
