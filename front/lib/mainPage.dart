@@ -1,4 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
+import 'package:brainbloom/login_page.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -6,42 +10,407 @@ void main() {
   ));
 }
 
-class LoginPage extends StatelessWidget {
+class MainPage extends StatefulWidget {
+  final String username;
+  final String desiredCourse;
+  final String level_of_course;
+  final String level_of_education;
+
+  MainPage({
+    Key? key,
+    required this.username,
+    required this.desiredCourse,
+    required this.level_of_course,
+    required this.level_of_education,
+  }) : super(key: key);
+
+  @override
+  _MainPageState createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  List<Course> recommendedCourses = [];
+  List<Course> randomCourses = [];
+  List<Course> clickedCourses = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchRecommendedCourses(widget.username);
+    fetchRandomCoursesFromLink();
+  }
+
+  Future<void> fetchRecommendedCourses(String username) async {
+    final uri = Uri.parse('http://127.0.0.1:5000/recommandation-skills/$username');
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      List<dynamic> coursesJson = json.decode(response.body);
+
+      setState(() {
+        recommendedCourses = coursesJson
+            .map((courseJson) => Course.fromJson(courseJson))
+            .toList();
+      });
+    } else {
+      throw Exception('Failed to load recommended courses');
+    }
+  }
+
+  Future<void> fetchRandomCoursesFromLink() async {
+    final link = 'http://127.0.0.1:5000/cours-dynamo';
+    final response = await http.get(Uri.parse(link));
+
+    if (response.statusCode == 200) {
+      List<dynamic> coursesJson = json.decode(response.body);
+
+      setState(() {
+        randomCourses = coursesJson
+            .map((courseJson) => Course.fromJson(courseJson))
+            .toList();
+      });
+    } else {
+      throw Exception('Failed to load random courses from link');
+    }
+  }
+
+  void addClickedCourse(Course course) {
+    setState(() {
+      clickedCourses.add(course);
+    });
+  }
+
+  Future<void> fetchOtherRecommendedCourses(String courseUrl) async {
+    final uri = Uri.parse('http://127.0.0.1:5000/recommandation-url/$courseUrl');
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      List<dynamic> coursesJson = json.decode(response.body);
+
+      setState(() {
+        clickedCourses = coursesJson
+            .map((courseJson) => Course.fromJson(courseJson))
+            .toList();
+      });
+    } else {
+      throw Exception('Failed to load other recommended courses');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text('Login Page'),
+        title: Text('Login'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(left: 2.0),
+            child: IconButton(
+              icon: Icon(Icons.person),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfilePage(
+                      username: widget.username,
+                      desiredCourse: widget.desiredCourse,
+                      level_of_course: widget.level_of_course,
+                      level_of_education: widget.level_of_education,
+                      clickedCourses: clickedCourses, // Pass clickedCourses to ProfilePage
+                    ),
+                  ),
+                );
+              },
+              padding: EdgeInsets.only(right: 50.0),
+            ),
+          ),
+        ],
       ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            // Naviguer vers la page principale
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => MainPage()),
-            );
-          },
-          child: Text('Se connecter'),
-        ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/background.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(56.0, kToolbarHeight + 56.0, 56.0, 56.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 56.0),
+                      child: Text(
+                        'Recommended Courses',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Column(
+                    children: recommendedCourses.map((course) {
+                      return CourseTile(
+                        title: course.courseName,
+                        url: course.courseUrl,
+                        onTap: () {
+                          addClickedCourse(course); // Add clicked course to clickedCourses
+                          _launchURL(course.courseUrl); // Launch URL
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  SizedBox(height: 20),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 56.0),
+                      child: Text(
+                        'Random Courses',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Column(
+                    children: randomCourses.map((course) {
+                      return CourseTile(
+                        title: course.courseName,
+                        url: course.courseUrl,
+                        onTap: () {
+                          addClickedCourse(course); // Add clicked course to clickedCourses
+                          _launchURL(course.courseUrl); // Launch URL
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class MainPage extends StatelessWidget {
+class CourseTile extends StatelessWidget {
+  final String title;
+  final String url;
+  final VoidCallback onTap; // Callback for onTap
+
+  CourseTile({required this.title, required this.url, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 5.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10.0),
+        border: Border.all(
+          color: Colors.grey,
+          width: 1.0,
+        ),
+      ),
+      child: ListTile(
+        title: Text(title),
+        onTap: onTap, // Call the onTap callback
+      ),
+    );
+  }
+}
+
+class Course {
+  final String courseName;
+  final String courseUrl;
+
+  Course({required this.courseName, required this.courseUrl});
+
+  factory Course.fromJson(Map<String, dynamic> json) {
+    return Course(
+      courseName: json['course_name'],
+      courseUrl: json['course_url'],
+    );
+  }
+}
+
+class ProfilePage extends StatefulWidget {
+  final String username;
+  final String desiredCourse;
+  final String level_of_course;
+  final String level_of_education;
+  final List<Course> clickedCourses; // Receive clickedCourses
+
+  ProfilePage({
+    required this.username,
+    required this.desiredCourse,
+    required this.level_of_course,
+    required this.level_of_education,
+    required this.clickedCourses, // Receive clickedCourses
+  });
+
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  late List<Course> otherRecommendedCourses; // Declare as late variable
+
+  @override
+  void initState() {
+    super.initState();
+    otherRecommendedCourses = []; // Initialize otherRecommendedCourses as an empty list
+    fetchOtherRecommendedCourses(); // Fetch other recommended courses
+  }
+
+  // Fetch other recommended courses by URL
+  Future<void> fetchOtherRecommendedCourses() async {
+    // Assuming the URL of the first clicked course is stored in the first item of clickedCourses list
+    final firstClickedCourseUrl = widget.clickedCourses.isNotEmpty ? widget.clickedCourses.first.courseUrl : '';
+    final uri = Uri.parse('http://127.0.0.1:5000/recommandation-url/$firstClickedCourseUrl');
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      List<dynamic> coursesJson = json.decode(response.body);
+
+      setState(() {
+        otherRecommendedCourses = coursesJson
+            .map((courseJson) => Course.fromJson(courseJson))
+            .toList();
+      });
+    } else {
+      throw Exception('Failed to load other recommended courses');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Main Page'),
+        title: Text('Profile'),
+        backgroundColor: Colors.transparent, // Make the app bar transparent
+        elevation: 0, // Remove app bar shadow
       ),
-      body: Center(
-        child: Text(
-          'Vous êtes sur la page principale!',
-          style: TextStyle(fontSize: 20.0),
-        ),
+      extendBodyBehindAppBar: true, // Allow background to extend behind app bar
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/background.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: kToolbarHeight),
+                Text(
+                  'Username: ${widget.username}',
+                  style: TextStyle(fontSize: 20),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Desired Course: ${widget.desiredCourse}',
+                  style: TextStyle(fontSize: 20),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Level of Course: ${widget.level_of_course}',
+                  style: TextStyle(fontSize: 20),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Level of Education: ${widget.level_of_education}',
+                  style: TextStyle(fontSize: 20),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Clicked Courses:',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: widget.clickedCourses.map((course) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 5.0),
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.grey),
+                        ),
+                        child: InkWell(
+                          onTap: () => _launchURL(course.courseUrl),
+                          child: Text(
+                            course.courseName,
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                if (otherRecommendedCourses.isNotEmpty) // Show other recommended courses if available
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 20),
+                      Text(
+                        'Other courses in the same field:',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: otherRecommendedCourses.map((course) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 5.0),
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: Colors.grey),
+                              ),
+                              child: InkWell(
+                                onTap: () => _launchURL(course.courseUrl),
+                                child: Text(
+                                  course.courseName,
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
+  }
+}
+
+Future<void> _launchURL(String url) async {
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw "Unable to open the URL: $url";
   }
 }

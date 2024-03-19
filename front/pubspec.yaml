@@ -33,6 +33,7 @@ dependencies:
   aws_client: ^0.4.1
   aws_dynamodb_api: ^2.0.0
   http: ^0.13.6
+  url_launcher: ^6.0.12
 
 
 
