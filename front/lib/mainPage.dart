@@ -32,6 +32,7 @@ class _MainPageState extends State<MainPage> {
   List<Course> recommendedCourses = [];
   List<Course> randomCourses = [];
   List<Course> clickedCourses = [];
+  List<Course> otherRecommendedCourses = []; // New list for other recommended courses
 
   @override
   void initState() {
@@ -78,6 +79,7 @@ class _MainPageState extends State<MainPage> {
     setState(() {
       clickedCourses.add(course);
     });
+    fetchOtherRecommendedCourses(course.courseUrl); // Fetch other recommended courses when a course is clicked
   }
 
   Future<void> fetchOtherRecommendedCourses(String courseUrl) async {
@@ -88,7 +90,7 @@ class _MainPageState extends State<MainPage> {
       List<dynamic> coursesJson = json.decode(response.body);
 
       setState(() {
-        clickedCourses = coursesJson
+        otherRecommendedCourses = coursesJson
             .map((courseJson) => Course.fromJson(courseJson))
             .toList();
       });
@@ -120,6 +122,7 @@ class _MainPageState extends State<MainPage> {
                       level_of_course: widget.level_of_course,
                       level_of_education: widget.level_of_education,
                       clickedCourses: clickedCourses, // Pass clickedCourses to ProfilePage
+                      otherRecommendedCourses: otherRecommendedCourses, // Pass otherRecommendedCourses to ProfilePage
                     ),
                   ),
                 );
@@ -192,6 +195,30 @@ class _MainPageState extends State<MainPage> {
                       );
                     }).toList(),
                   ),
+                  if (otherRecommendedCourses.isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 20),
+                        Text(
+                          'Other courses in the same field:',
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: otherRecommendedCourses.map((course) {
+                            return CourseTile(
+                              title: course.courseName,
+                              url: course.courseUrl,
+                              onTap: () {
+                                addClickedCourse(course); // Add clicked course to clickedCourses
+                                _launchURL(course.courseUrl); // Launch URL
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),
@@ -249,6 +276,7 @@ class ProfilePage extends StatefulWidget {
   final String level_of_course;
   final String level_of_education;
   final List<Course> clickedCourses; // Receive clickedCourses
+  final List<Course> otherRecommendedCourses; // Receive otherRecommendedCourses
 
   ProfilePage({
     required this.username,
@@ -256,6 +284,7 @@ class ProfilePage extends StatefulWidget {
     required this.level_of_course,
     required this.level_of_education,
     required this.clickedCourses, // Receive clickedCourses
+    required this.otherRecommendedCourses, // Receive otherRecommendedCourses
   });
 
   @override
@@ -263,35 +292,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  late List<Course> otherRecommendedCourses; // Declare as late variable
-
-  @override
-  void initState() {
-    super.initState();
-    otherRecommendedCourses = []; // Initialize otherRecommendedCourses as an empty list
-    fetchOtherRecommendedCourses(); // Fetch other recommended courses
-  }
-
-  // Fetch other recommended courses by URL
-  Future<void> fetchOtherRecommendedCourses() async {
-    // Assuming the URL of the first clicked course is stored in the first item of clickedCourses list
-    final firstClickedCourseUrl = widget.clickedCourses.isNotEmpty ? widget.clickedCourses.first.courseUrl : '';
-    final uri = Uri.parse('http://127.0.0.1:5000/recommandation-url/$firstClickedCourseUrl');
-    final response = await http.get(uri);
-
-    if (response.statusCode == 200) {
-      List<dynamic> coursesJson = json.decode(response.body);
-
-      setState(() {
-        otherRecommendedCourses = coursesJson
-            .map((courseJson) => Course.fromJson(courseJson))
-            .toList();
-      });
-    } else {
-      throw Exception('Failed to load other recommended courses');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -338,7 +338,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 SizedBox(height: 20),
                 Text(
-                  'Clicked Courses:',
+                  'My Courses:',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 Column(
@@ -364,40 +364,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     );
                   }).toList(),
                 ),
-                if (otherRecommendedCourses.isNotEmpty) // Show other recommended courses if available
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 20),
-                      Text(
-                        'Other courses in the same field:',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: otherRecommendedCourses.map((course) {
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 5.0),
-                            child: Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.grey),
-                              ),
-                              child: InkWell(
-                                onTap: () => _launchURL(course.courseUrl),
-                                child: Text(
-                                  course.courseName,
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
+
               ],
             ),
           ),
